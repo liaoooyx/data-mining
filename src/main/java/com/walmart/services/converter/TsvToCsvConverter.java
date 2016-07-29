@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
@@ -20,31 +21,30 @@ public class TsvToCsvConverter {
 	private static String encoding = "UTF-8";
 	
 	public static void main(String[] args) throws Exception {
-		if(args.length < 3) {
-	        System.out.println("Proper Usage is: <filePath> <inputTsvFile> <outputCsvFile>");
+		if(args.length < 2) {
+	        System.out.println("Proper Usage is: <inputTsvFile> <outputCsvFile>");
 	        System.exit(0);
 	    }
-		String filePath = args[0];
-		File inputFile = new File(args[1]);
-		File outputFile = new File(args[2]);
+		File inputFile = new File(args[0]);
+		File outputFile = new File(args[1]);
+		String logFile = outputFile.getParent() + File.separator + "tsvtocsv.log";
+		
+		PrintStream out = new PrintStream(new File(logFile));
+		System.setOut(out);
 		
 		System.out.println("************** TSV To CSV Converter **************");
-		System.out.println("File Path: " + filePath);
 		System.out.println("Input TSV file: " + inputFile.getAbsolutePath());
 		System.out.println("Output TSV file: " + outputFile.getAbsolutePath() + "\n\n");
 		
 		TsvToCsvConverter converter = new TsvToCsvConverter();
-	    File folder = new File(filePath);
-        File[] listOfFiles = folder.listFiles();
-        for (int i = 0; i < listOfFiles.length; i++) {
-            File file = listOfFiles[i];
-            if (file.isFile() && file.getName().endsWith("tsv")) {
-            	converter.readAndWrite(inputFile, outputFile, encoding);
-            }
+        if (inputFile.exists() && inputFile.getName().endsWith("tsv")) {
+        	converter.readAndWrite(inputFile, outputFile, encoding);
+        } else {
+        	System.out.println("Please pass a valid TSV file");
         }
 	}
 	
-	private void readAndWrite(File inputFile, File outputFile, String encoding) {
+	private void readAndWrite(File inputFile, File outputFile, String encoding) throws IOException {
 		TsvParserSettings settings = new TsvParserSettings();
 		settings.getFormat().setLineSeparator("\n");
 		TsvParser parser = new TsvParser(settings);
@@ -70,7 +70,7 @@ public class TsvToCsvConverter {
 			parser.stopParsing();
 			writer.close();
 		}
-		System.out.println("\n\n************** TSV to CSV converted succesfully **************");
+		System.out.println("\n\n************** TSV to CSV converted successfully **************");
 	}
 	
 	private CsvWriter createCsvWriter(File outputFile, String encoding) {
