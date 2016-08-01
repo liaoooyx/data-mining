@@ -19,6 +19,7 @@ import com.univocity.parsers.tsv.TsvParserSettings;
 
 public class TsvToCsvConverter {
 	private static String encoding = "UTF-8";
+	private static String lineSeparator = "\n";
 	
 	public static void main(String[] args) throws Exception {
 		if(args.length < 2) {
@@ -27,7 +28,9 @@ public class TsvToCsvConverter {
 	    }
 		File inputFile = new File(args[0]);
 		File outputFile = new File(args[1]);
-		String logFile = outputFile.getParent() + File.separator + "tsvtocsv.log";
+		
+		String currentDirectory = System.getProperty("user.dir");
+		String logFile = currentDirectory + File.separator + "tsvtocsv.log";
 		
 		PrintStream out = new PrintStream(new File(logFile));
 		System.setOut(out);
@@ -46,9 +49,10 @@ public class TsvToCsvConverter {
 	
 	private void readAndWrite(File inputFile, File outputFile, String encoding) throws IOException {
 		TsvParserSettings settings = new TsvParserSettings();
-		settings.getFormat().setLineSeparator("\n");
-		TsvParser parser = new TsvParser(settings);
+		settings.getFormat().setLineSeparator(lineSeparator);
+		settings.setMaxCharsPerColumn(-1);
 		
+		TsvParser parser = new TsvParser(settings);
 		CsvWriter writer = createCsvWriter(outputFile, encoding);
 
 		//call beginParsing to read records one by one, iterator-style.
@@ -75,7 +79,12 @@ public class TsvToCsvConverter {
 	
 	private CsvWriter createCsvWriter(File outputFile, String encoding) {
 	    CsvWriterSettings settings = new CsvWriterSettings();
-	    settings.setQuoteAllFields(true);
+	    //settings.setQuoteAllFields(true);
+	    settings.getFormat().setLineSeparator(lineSeparator);
+	    settings.setHeaderWritingEnabled(true);
+	    settings.setIgnoreLeadingWhitespaces(false);
+		settings.setIgnoreTrailingWhitespaces(false);
+		settings.setMaxCharsPerColumn(-1);
 
 	    try {
 	        return new CsvWriter(new OutputStreamWriter(new FileOutputStream(outputFile), encoding), settings);
