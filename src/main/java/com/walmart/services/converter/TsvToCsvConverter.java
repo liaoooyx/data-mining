@@ -12,14 +12,16 @@ import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
 import com.univocity.parsers.common.TextWritingException;
+import com.univocity.parsers.csv.CsvFormat;
+import com.univocity.parsers.csv.CsvParser;
+import com.univocity.parsers.csv.CsvParserSettings;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
-import com.univocity.parsers.tsv.TsvParser;
-import com.univocity.parsers.tsv.TsvParserSettings;
 
 public class TsvToCsvConverter {
 	private static String encoding = "UTF-8";
 	private static String lineSeparator = "\n";
+	private static char delimiter = '\t';
 	
 	public static void main(String[] args) throws Exception {
 		if(args.length < 2) {
@@ -48,21 +50,30 @@ public class TsvToCsvConverter {
 	}
 	
 	private void readAndWrite(File inputFile, File outputFile, String encoding) throws IOException {
-		TsvParserSettings settings = new TsvParserSettings();
-		settings.getFormat().setLineSeparator(lineSeparator);
-		settings.setMaxCharsPerColumn(-1);
-		
-		TsvParser parser = new TsvParser(settings);
+		CsvFormat format = new CsvFormat();
+	    format.setDelimiter(delimiter);
+	    format.setLineSeparator(lineSeparator);
+	    
+	    CsvParserSettings settings = new CsvParserSettings();
+	    settings.setDelimiterDetectionEnabled(true);
+	    settings.setMaxCharsPerColumn(-1);
+	    settings.setFormat(format);
+	    
+	    CsvParser parser = new CsvParser(settings);
 		CsvWriter writer = createCsvWriter(outputFile, encoding);
-
+		
 		//call beginParsing to read records one by one, iterator-style.
-		int index = 0;
+		int index = 1;
 		try {
 			parser.beginParsing(new InputStreamReader(new FileInputStream(inputFile), encoding));
 			String[] row;
 			System.out.println("Reading TSV file: " + inputFile);
 			while ((row = parser.parseNext()) != null) {
 				System.out.println("Reading row [" + index + "]: " + Arrays.toString(row));
+//				if(row.length < parser.getContext().headers().length) {
+//					System.out.println("Skipping row [" + index + "]: " + Arrays.toString(row));
+//	                return; //skip the row if the number of columns doesn't match number of headers
+//	            }
 				convertToCsv(row, writer, index);
 				index++;
 			}
@@ -74,12 +85,12 @@ public class TsvToCsvConverter {
 			parser.stopParsing();
 			writer.close();
 		}
+		System.out.println("\nTotal number of rows converted from CSV to TSV: " + writer.getRecordCount());
 		System.out.println("\n\n************** TSV to CSV converted successfully **************");
 	}
 	
 	private CsvWriter createCsvWriter(File outputFile, String encoding) {
 	    CsvWriterSettings settings = new CsvWriterSettings();
-	    //settings.setQuoteAllFields(true);
 	    settings.getFormat().setLineSeparator(lineSeparator);
 	    settings.setHeaderWritingEnabled(true);
 	    settings.setIgnoreLeadingWhitespaces(false);
