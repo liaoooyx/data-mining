@@ -4,31 +4,33 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
+import com.univocity.parsers.csv.CsvFormat;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
-import com.univocity.parsers.tsv.TsvParser;
-import com.univocity.parsers.tsv.TsvParserSettings;
 
 /**
  * Unit test for simple App.
  */
 public class TSVToCsvTest {
-	String input = "1\t0\t3029\t0\tNULL\t0\t3029\t1\t0\t\tPRODUCE\tProduce\t\tProduce\t\t\t\t1\tea\t3\t2\t4\tNULL\tMandarin\t\"Mandarin\tSatusuma\"\t\t\t\t\t\t\t1/2/15 9:35\t\t1\tmedium mandarin\tNULL";
+	//String input = "1\t0\t3029\t0\tNULL\t0\t3029\t1\t0\t\tPRODUCE\tProduce\t\tProduce\t\t\t\t1\tea\t3\t2\t4\tNULL\tMandarin\t\"Mandarin\tSatusuma\"\t\t\t\t\t\t\t1/2/15 9:35\t\t1\tmedium mandarin\tNULL";
 
+	String input = "4394\t1\t0\tPRODUCE\tProduce\t1\tea\t9\t4\t54\tNULL\tPapaya\tPapaya\t1\t\"fruit\tNULL";
+			
 	@Test
 	public void runTsvTest() {
-
-		String[] tsvRow = new TsvParser(new TsvParserSettings()).parseLine(input);
-
-		CsvParserSettings settings = new CsvParserSettings();
-		settings.getFormat().setDelimiter('\t');
+		CsvFormat format = new CsvFormat();
+	    format.setDelimiter('\t');
+	    format.setLineSeparator("\n");
+	    
+	    CsvParserSettings settings = new CsvParserSettings();
+	    settings.setDelimiterDetectionEnabled(true);
+	    settings.setMaxCharsPerColumn(-1);
+	    settings.setMaxColumns(512);
+	    settings.setFormat(format);
+		
 		String[] csvRow = new CsvParser(settings).parseLine(input);
 
-		System.out.println("tsvRow: " + Arrays.toString(tsvRow));
-		for (String value : tsvRow) {
-			System.out.println(value);
-		}
-		System.out.println(Arrays.toString(csvRow));
+		System.out.println("csvRow: " + Arrays.toString(csvRow));
 		for (String value : csvRow) {
 			System.out.println(value);
 		}

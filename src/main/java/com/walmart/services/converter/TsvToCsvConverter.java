@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
@@ -57,36 +58,59 @@ public class TsvToCsvConverter {
 	    CsvParserSettings settings = new CsvParserSettings();
 	    settings.setDelimiterDetectionEnabled(true);
 	    settings.setMaxCharsPerColumn(-1);
+	    settings.setMaxColumns(512);
 	    settings.setFormat(format);
+	    
+//	    //Let's set a RowProcessorErrorHandler to log the error. The parser will keep running.
+//	    settings.setProcessorErrorHandler(new RowProcessorErrorHandler() {
+//			public void handleError(DataProcessingException error, Object[] inputRow, ParsingContext context) {
+//				System.out.println("Error processing row: " + Arrays.toString(inputRow));
+//	        	System.out.println("Error details: column '" + error.getColumnName() + "' (index " + error.getColumnIndex() + ") has value '" + inputRow[error.getColumnIndex()] + "'");
+//			}
+//	    });
 	    
 	    CsvParser parser = new CsvParser(settings);
 		CsvWriter writer = createCsvWriter(outputFile, encoding);
 		
 		//call beginParsing to read records one by one, iterator-style.
 		int index = 1;
+		int headerLength = 0;
 		try {
-			parser.beginParsing(new InputStreamReader(new FileInputStream(inputFile), encoding));
+			parser.beginParsing(getReader(inputFile, encoding));
 			String[] row;
 			System.out.println("Reading TSV file: " + inputFile);
 			while ((row = parser.parseNext()) != null) {
 				System.out.println("Reading row [" + index + "]: " + Arrays.toString(row));
-//				if(row.length < parser.getContext().headers().length) {
-//					System.out.println("Skipping row [" + index + "]: " + Arrays.toString(row));
-//	                return; //skip the row if the number of columns doesn't match number of headers
-//	            }
+				if (index == 1) {
+					headerLength = row.length;
+				}
+				System.out.println("Header length: " + headerLength);
+				System.out.println("Row length: " + row.length);
+				if(row.length > headerLength) {
+					System.out.println("Skipping row [" + index + "]: " + Arrays.toString(row));
+					index++;
+	                continue; //skip the row if the number of columns doesn't match number of headers
+	            }
 				convertToCsv(row, writer, index);
 				index++;
 			}
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} finally {
 			parser.stopParsing();
 			writer.close();
 		}
 		System.out.println("\nTotal number of rows converted from CSV to TSV: " + writer.getRecordCount());
 		System.out.println("\n\n************** TSV to CSV converted successfully **************");
+	}
+	
+	public Reader getReader(File inputFile, String encoding) {
+		try {
+			return new InputStreamReader(new FileInputStream(inputFile), encoding);
+		} catch (UnsupportedEncodingException e) {
+			throw new IllegalStateException("Unable to read inputFile", e);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	private CsvWriter createCsvWriter(File outputFile, String encoding) {
@@ -108,6 +132,7 @@ public class TsvToCsvConverter {
 		try {
 			System.out.println("Writing row [" + index + "]: " + Arrays.toString(row));
 			writer.writeRow(row);
+		
 		} catch (Exception e) {
 			 throw new TextWritingException("Error writing row: " + row + " at line no:" + index);
 		}
