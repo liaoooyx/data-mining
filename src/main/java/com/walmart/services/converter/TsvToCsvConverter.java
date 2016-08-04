@@ -61,14 +61,6 @@ public class TsvToCsvConverter {
 	    settings.setMaxColumns(512);
 	    settings.setFormat(format);
 	    
-//	    //Let's set a RowProcessorErrorHandler to log the error. The parser will keep running.
-//	    settings.setProcessorErrorHandler(new RowProcessorErrorHandler() {
-//			public void handleError(DataProcessingException error, Object[] inputRow, ParsingContext context) {
-//				System.out.println("Error processing row: " + Arrays.toString(inputRow));
-//	        	System.out.println("Error details: column '" + error.getColumnName() + "' (index " + error.getColumnIndex() + ") has value '" + inputRow[error.getColumnIndex()] + "'");
-//			}
-//	    });
-	    
 	    CsvParser parser = new CsvParser(settings);
 		CsvWriter writer = createCsvWriter(outputFile, encoding);
 		
@@ -77,28 +69,32 @@ public class TsvToCsvConverter {
 		int headerLength = 0;
 		try {
 			parser.beginParsing(getReader(inputFile, encoding));
-			String[] row;
+			String[] row = null;
 			System.out.println("Reading TSV file: " + inputFile);
-			while ((row = parser.parseNext()) != null) {
-				System.out.println("Reading row [" + index + "]: " + Arrays.toString(row));
-				if (index == 1) {
-					headerLength = row.length;
-				}
-				System.out.println("Header length: " + headerLength);
-				System.out.println("Row length: " + row.length);
-				if(row.length > headerLength) {
-					System.out.println("Skipping row [" + index + "]: " + Arrays.toString(row));
+			try {
+				while ((row = parser.parseNext()) != null) {
+					if (index == 1) {
+						headerLength = row.length;
+					}
+					System.out.println("Header length: " + headerLength);
+					System.out.println("Row length: " + row.length);
+					if (row.length > headerLength) {
+						System.out.println("Skipping row [" + index + "]: " + Arrays.toString(row));
+						index++;
+						continue; // skip the row if the number of columns
+									// doesn't match number of headers
+					}
+					convertToCsv(row, writer, index);
 					index++;
-	                continue; //skip the row if the number of columns doesn't match number of headers
-	            }
-				convertToCsv(row, writer, index);
-				index++;
+				}
+			} catch (Exception e) {
+				System.out.println("Error processing row: " + Arrays.toString(row));
 			}
 		} finally {
 			parser.stopParsing();
 			writer.close();
 		}
-		System.out.println("\nTotal number of rows converted from CSV to TSV: " + writer.getRecordCount());
+		System.out.println("\nTotal number of rows converted from CSV to TSV after skipping invalid rows: " + writer.getRecordCount());
 		System.out.println("\n\n************** TSV to CSV converted successfully **************");
 	}
 	
