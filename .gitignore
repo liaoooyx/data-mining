@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 /target/
+.idea/
 =======
 *.class
 
@@ -11,6 +12,7 @@
 *.war
 *.ear
 
+*.log
+
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
->>>>>>> cf6684a2dd754e6a469364aaf28c318f5bd2eea7

@@ -34,7 +34,6 @@ public class TsvToCsvConverter {
 		
 		String currentDirectory = System.getProperty("user.dir");
 		String logFile = currentDirectory + File.separator + "tsvtocsv.log";
-		
 		PrintStream out = new PrintStream(new File(logFile));
 		System.setOut(out);
 		
