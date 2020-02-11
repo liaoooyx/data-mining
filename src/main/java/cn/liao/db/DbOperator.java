@@ -76,41 +76,33 @@ public class DbOperator {
 		}
 	}
 
-	public void insertListInto(List<Cw1Dataset> list, String tableName) throws SQLException {
-		//获取连接
-		Connection conn = getConnection();
-		conn.setAutoCommit(false);
-		//sql
-		String sql = "INSERT INTO " + tableName + "(id, tweet, task_a, task_b, task_c) VALUES(?,?,?,?,?)";
-		//预编译
-		PreparedStatement ps = conn.prepareStatement(sql); //预编译SQL，减少sql执行
-		for (Cw1Dataset dataset : list) {
-			//传参
-			ps.setInt(1, dataset.getId());
-			ps.setString(2, dataset.getTweet());
-			ps.setString(3, dataset.getTask_a());
-			ps.setString(4, dataset.getTask_b());
-			ps.setString(5, dataset.getTask_c());
-			ps.addBatch();
-
+	public static void close(Connection conn) {
+		if (conn != null) {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
-		ps.executeBatch();
-		conn.commit();
-		close(ps, conn);
 	}
 
-	public List<Cw1Dataset> readAllFrom(String tableName) throws SQLException {
-		String sql = "SELECT * FROM " + tableName;
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt.executeQuery(sql);
-		List<Cw1Dataset> list = new ArrayList<Cw1Dataset>();
-		while (rs.next()) {
-			list.add(new Cw1Dataset(rs.getInt("id"), rs.getString("tweet"), rs.getString("task_a"),
-					rs.getString("task_b"), rs.getString("task_c")));
+	public static void close(Statement sta) {
+		if (sta != null) {
+			try {
+				sta.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
-		close(rs, stmt, conn);
-		return list;
 	}
 
+	public static void close(ResultSet rs) {
+		if (rs != null) {
+			try {
+				rs.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 }

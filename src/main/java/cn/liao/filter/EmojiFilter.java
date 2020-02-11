@@ -2,12 +2,14 @@ package cn.liao.filter;
 
 import com.vdurmont.emoji.EmojiParser;
 
+import java.util.List;
+
 /**
  * Created by Yuxiang Liao on 2020-02-11 14:37.
  */
 public class EmojiFilter {
 
-	public static String filterAllEmoji(String string){
+	public static String removeAllEmoji(String string){
 		return EmojiParser.removeAllEmojis(string);
 	}
 
