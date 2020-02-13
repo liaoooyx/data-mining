@@ -1,5 +1,7 @@
 package cn.liao.db;
 
+import java.util.function.UnaryOperator;
+
 /**
  * Created by Yuxiang Liao on 2020-02-11 16:16.
  */
@@ -9,6 +11,9 @@ public class Cw1Dataset {
 	private String task_a;
 	private String task_b;
 	private String task_c;
+
+	public Cw1Dataset(){
+	}
 
 	public Cw1Dataset(int id, String tweet, String task_a, String task_b, String task_c) {
 		this.id = id;
@@ -60,7 +65,11 @@ public class Cw1Dataset {
 
 	@Override
 	public String toString() {
-		return "Cw1Dataset{" + "id=" + id + ", task_a='" + task_a + '\'' + ", task_b='" +
-				task_b + '\'' + ", task_c='" + task_c + '\'' + ", tweet='" + tweet + '\'' + '}';
+		return "Cw1Dataset{" + "id=" + id + ", task_a='" + task_a + '\'' + ", task_b='" + task_b + '\'' + ", task_c='" +
+				task_c + '\'' + ", tweet='" + tweet + '\'' + '}';
+	}
+
+	public void filterTweet(UnaryOperator<String> filter) {
+		tweet = filter.apply(tweet);
 	}
 }
