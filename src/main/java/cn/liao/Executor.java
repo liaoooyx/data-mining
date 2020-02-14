@@ -2,6 +2,7 @@ package cn.liao;
 
 import cn.liao.db.Cw1Dataset;
 import cn.liao.db.DbOperator;
+import cn.liao.file.FileOperator;
 import cn.liao.filter.Filter;
 import com.uttesh.exude.exception.InvalidDataException;
 
@@ -23,7 +24,7 @@ public class Executor {
 	public static void main(String[] args) {
 		Connection conn = DbOperator.getConnection();
 		//		step1To4(conn);
-		//		step5(conn);
+		//		step5(conn,"/Users/liao/Desktop/Text Normalizatin.txt");
 		step89(conn);
 		DbOperator.close(conn);
 
@@ -41,17 +42,6 @@ public class Executor {
 			s.filterTweet(Filter::removeAllSpecificString);
 			s.filterTweet(Filter::removeAllPunctuation);
 			s.filterTweet(Filter::convertToLowerCase);
-			//stop words
-			//			s.filterTweet(s -> {
-			//				try {
-			//					return Filter.removeAllStopWords(s);
-			//				} catch (InvalidDataException e) {
-			//					e.printStackTrace();
-			//				}
-			//				return s;
-			//			});
-			//numbers
-			//			s.filterTweet(Filter::removeAllNumber);
 		});
 
 		// write all records into trainingset_no_emoji table.
@@ -61,10 +51,11 @@ public class Executor {
 
 	}
 
-	public static void step5(Connection conn) {
+	public static void step5(Connection conn,String filePath) {
 		String sql = "SELECT * FROM trainingset_1234";
 		List<Cw1Dataset> list = readAll(conn, sql);
-		ArrayList<String> normalizationTextList = readFromFile("/Users/liao/Desktop/Text Normalizatin.txt");
+		ArrayList<String> normalizationTextList =
+				FileOperator.readFromFile(filePath);
 
 		for (int i = 0; i < list.size(); i++) {
 			list.get(i).setTweet(normalizationTextList.get(i).trim());
@@ -97,18 +88,6 @@ public class Executor {
 		// write all records into trainingset_no_emoji table.
 		String sql2 = "INSERT INTO trainingset_1234_5_89(id, tweet, task_a, task_b, task_c) VALUES(?,?,?,?,?)";
 		writeAll(conn, sql2, list);
-	}
-
-	public static ArrayList<String> readFromFile(String fullPath) {
-		ArrayList<String> list = new ArrayList<>();
-		BufferedReader in = null;
-		try {
-			in = new BufferedReader(new FileReader(fullPath));
-			list = in.lines().collect(Collectors.toCollection(ArrayList::new));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		return list;
 	}
 
 	public static List<Cw1Dataset> readAll(Connection conn, String sql) {
