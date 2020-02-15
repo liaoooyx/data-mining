@@ -1,1 +1,3 @@
-
+TestsetOperator用于输出测试集的文件
+Executor输出训练集的文件
+ArffFileOperator用于检查Weka对测试集中的字符串的如何转义
