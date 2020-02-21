@@ -1,6 +1,6 @@
 package cn.liao.file;
 
-import cn.liao.Executor;
+import cn.liao.TrainsetExecutor;
 import cn.liao.db.Cw1Dataset;
 import cn.liao.db.DbOperator;
 
@@ -212,9 +212,9 @@ public class TestsetOperator {
 
 	public static void main(String[] args) throws IOException {
 		Connection conn = DbOperator.getConnection();
-		List<Cw1Dataset> list1 = Executor.readAll(conn, "testseta");
-		List<Cw1Dataset> list2 = Executor.readAll(conn, "testsetb");
-		List<Cw1Dataset> list3 = Executor.readAll(conn, "testsetc");
+		List<Cw1Dataset> list1 = TrainsetExecutor.readAll(conn, "testseta");
+		List<Cw1Dataset> list2 = TrainsetExecutor.readAll(conn, "testsetb");
+		List<Cw1Dataset> list3 = TrainsetExecutor.readAll(conn, "testsetc");
 		String middleName = "testset";
 
 		writeArffFileForTask_a(list1, "OLID_" + middleName + "_a", "OLID_" + middleName + "_a");

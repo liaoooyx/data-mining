@@ -14,12 +14,12 @@ import java.util.List;
 /**
  * Created by Yuxiang Liao on 2020-02-11 21:01.
  */
-public class Executor {
+public class TrainsetExecutor {
 
 
 	public static void main(String[] args) throws IOException {
 		Connection conn = DbOperator.getConnection();
-		//		step1To4(conn);
+				step1To4(conn);
 		//		step5or6or7(conn, "/Users/liao/Desktop/Text Normalizatin", "trainingset_1234_5");
 		//		step89(conn, "trainingset_1234_5", "trainingset_1234_5_89");
 		//		step5or6or7(conn, "/Users/liao/Desktop/Disambiguated concepts", "trainingset_1234_6");
@@ -27,7 +27,7 @@ public class Executor {
 		//		step5or6or7(conn, "/Users/liao/Desktop/Both", "trainingset_1234_7");
 		//		step89(conn, "trainingset_1234_7", "trainingset_1234_7_89");
 
-		List<Cw1Dataset> list5 = Executor.readAll(conn, "trainingset_1234_5_89");
+		List<Cw1Dataset> list5 = TrainsetExecutor.readAll(conn, "trainingset_1234_5_89");
 //		FileOperator.writeArffFile(list5, "OLID_" + "trainingset_normal" + "_all", "OLID_" + "trainingset_Text_Normalization" + "_all");
 //		FileOperator.writeArffFileForTask_a(list5, "OLID_" + "trainingset_normal" + "_a", "OLID_" + "trainingset_Text_Normalization" + "_a");
 //		FileOperator.writeArffFileForTask_b(list5, "OLID_" + "trainingset_normal" + "_b", "OLID_" + "trainingset_Text_Normalization" + "_b");
@@ -79,7 +79,6 @@ public class Executor {
 		// write all records into trainingset_no_emoji table.
 		String sql2 = "INSERT INTO trainingset_1234(id, tweet, task_a, task_b, task_c) VALUES(?,?,?,?,?)";
 		writeAll(conn, sql2, list);
-
 
 	}
 

@@ -40,7 +40,7 @@ public class ArffFileOperator {
 		InstanceQuery query = new InstanceQuery();
 		query.setUsername(USER);
 		query.setPassword(PASSWORD);
-		query.setQuery("select id,tweet,task_a from testseta");
+		query.setQuery("select id,tweet,task_a from testsetb");
 		// You can declare that your data set is sparse
 		 query.setSparseData(true);
 		Instances data = query.retrieveInstances();

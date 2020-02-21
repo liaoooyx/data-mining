@@ -1,6 +1,5 @@
  jdbcDriver=com.mysql.cj.jdbc.Driver
  jdbcURL=jdbc:mysql://localhost:3306/data_mining
- INT=5
 
  #the method that is used to retrieve values from the db
  # (java datatype + RecordSet.<method>) string, getString() = 0;    --> nominal
@@ -10,6 +9,7 @@
   short, getByte()= 4;        -->numeric
   int, getInteger() = 5;      --> numeric
   INT, getInteger() = 5;      --> numeric
+  INT UNSIGNED, getInteger() = 5;   --> numeric
   INT(11), getInteger() = 5;  -->numeric
   INT., getInteger() = 5;     -->numeric
   long, getLong() = 6;        --> numeric
@@ -18,6 +18,8 @@
   text, getString() = 9;      --> string
   time, getTime() = 10;       --> date
   varchar, getString = 9      --> string
+
+
 
   # the original conversion: <column type>=<conversion>
   char=0
@@ -45,7 +47,8 @@
   VARCHAR=0
   LONGVARCHAR=9
   BINARY=0
-  VARBINARY=0LONGVARBINARY=9
+  VARBINARY=0
+  LONGVARBINARY=9
   BIT=1
   NUMERIC=2
   DECIMAL=2
